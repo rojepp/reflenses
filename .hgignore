@@ -1,0 +1,5 @@
+glob:*/bin
+glob:*/obj
+glob:*.suo
+glob:*.sln.docstates
+glob:*.orig

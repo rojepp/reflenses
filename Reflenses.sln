@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Reflenses", "Reflenses\Reflenses.fsproj", "{AF0FF3DE-66ED-46B3-9024-749A1645A001}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ForDebug", "ForDebug\ForDebug.fsproj", "{0DDA905A-DDA1-4B91-AF4C-F07B2BE324C4}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Reflenses.Tests", "Reflenses.Tests\Reflenses.Tests.fsproj", "{98C1B9A9-BA0C-4A89-B9AD-3C02FDF6E225}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AF0FF3DE-66ED-46B3-9024-749A1645A001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF0FF3DE-66ED-46B3-9024-749A1645A001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF0FF3DE-66ED-46B3-9024-749A1645A001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF0FF3DE-66ED-46B3-9024-749A1645A001}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DDA905A-DDA1-4B91-AF4C-F07B2BE324C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DDA905A-DDA1-4B91-AF4C-F07B2BE324C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DDA905A-DDA1-4B91-AF4C-F07B2BE324C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DDA905A-DDA1-4B91-AF4C-F07B2BE324C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98C1B9A9-BA0C-4A89-B9AD-3C02FDF6E225}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98C1B9A9-BA0C-4A89-B9AD-3C02FDF6E225}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98C1B9A9-BA0C-4A89-B9AD-3C02FDF6E225}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98C1B9A9-BA0C-4A89-B9AD-3C02FDF6E225}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
