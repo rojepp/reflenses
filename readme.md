@@ -19,23 +19,30 @@ Inspired by [Mauricio Scheffers post][mausch].
     // Flat hierarchy, not bad at all.
     let newversion = { original with FavoriteColor = "Yellow" }
 
-    // Nested copy, more cumbersome, and how does it really work with option types?
-    // You have to replace all of it. Better pray that newversion.Pet was a 'Some'!
+    // Nested copy, more cumbersome, and how does it 
+    // really work with option types?
+    // You have to replace all of it. 
+    // Better pray that newversion.Pet was a 'Some'!
     let newversion2 = { newversion with Pet = Some { newversion.Pet with Name = "ABC" } }
 
 With Reflenses, you can create a new record by doing this: 
 
-    // The simple case is not a win, more complex than the built-in method. 
+    // The simple case is not a win, more complex than 
+    // the built-in method. 
     let newversion = set original <@ (fun p -> p.FavoriteColor) @> "Yellow"
+ 
     // Replace all of the pet
     let newversion2 = set newversion <@ (fun p -> p.Pet) @> (Some { Animal = "Monkey"; Name = "Spot" })
     // Just replace the pet name
     let renamedpet = set newversion <@ (fun p -> p.Pet.Value.Name) @> "Spot (still a dog)"
 
 All of these are type-checked, thanks to the power of F# quotations. 
-I'm not quite happy with the syntax for setting partial options, at the moment. Share your ideas!
+I'm not quite happy with the syntax for setting partial options,
+at the moment. Share your ideas!
 
-You can also set several options at once. This is done as a tuple in the quotation and input value:
+You can also set several options at once. This is done as a tuple
+in the quotation and input value:
+
     let newversion = set original <@ (fun p -> p.FavoriteColor, p.Pet.Value.Animal) @> "Black","Elephant"
 
 This is also fully type checked. 
@@ -43,8 +50,9 @@ This is also fully type checked.
 ## Performance
 
 This is way slower than the built-in way of creating new records. 
-Before optmizing, a test run of 10.000 records would take ~10 seconds on my 4 years old laptop. 
-After optmizing the most obvious bits, it's down to ~3 seconds, where the native F# version is ~20 ms.
+Before optmizing, a test run of 10.000 records would take ~12 seconds
+on my 4 years old laptop. After optmizing the most obvious bits, 
+it's down to ~4 seconds, where the native F# version is ~2 ms.
 If you hoist the expression out of the loop, you get a massive speedup. This literal doesn't seem to 
 get cached by F#. 
 
@@ -58,10 +66,9 @@ get cached by F#.
         sw.Stop()
         sw.ElapsedMilliseconds
      
-     time (fun () -> set robert expr "Volvo")  10000 // Fast
-     time (fun () -> set robert <@ (fun f -> f.Car.Make.Make) @> "Volvo" ) 10000// Slow
-     time (fun () -> { robert with Car = { robert.Car with Make = { robert.Car.Make with Make = "Volvo" } } } ) 10000// Slow
-     
+     time (fun () -> set robert expr "Volvo")  10000 // Expression out of loop, fast
+     time (fun () -> set robert <@ (fun f -> f.Car.Make.Make) @> "Volvo" ) 10000b// Slow
+     time (fun () -> { robert with Car = { robert.Car with Make = { robert.Car.Make with Make = "Volvo" } } } ) 10000 // Fastest
      
      Real: 00:00:00.519, CPU: 00:00:00.530, GC gen0: 9, gen1: 0, gen2: 0
      Real: 00:00:04.367, CPU: 00:00:04.336, GC gen0: 85, gen1: 0, gen2: 0
