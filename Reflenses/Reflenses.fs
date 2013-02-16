@@ -8,6 +8,14 @@ open Microsoft.FSharp.Quotations.DerivedPatterns
 open Microsoft.FSharp.Reflection
 open System.Reflection
 
+let private (|OptionValue|_|) (owner:obj, prop:PropertyInfo) =
+   let typ = prop.DeclaringType.FullName
+   // Such a hack!
+   if typ.IndexOf("FSharpOption") >= 0 then Some (owner, prop) else None
+
+let private (|Record|_|) (owner:obj, prop:PropertyInfo) = 
+   if FSharpType.IsRecord (prop.DeclaringType) then Some (owner,prop) else None
+
 let rec getLambdaProps (expr: Expr) =
    let rec loop expr acc =
       match expr with
@@ -22,8 +30,13 @@ let rec getLambdaProps (expr: Expr) =
 let getValues (props: PropertyInfo list) (owner:obj) = 
    let rec loop (props: PropertyInfo list) owner acc= 
       match props with 
+//      | OptionValue(owner, prop) :: xs -> 
+//          let newowner = if owner = null then x.GetValue () else x.GetValue owner
+//          let v = System.Activator.CreateInstance(ty, setval)
+//          loop xs newowner acc
       | x :: xs -> 
-         let newowner = x.GetValue owner
+         let newowner = if owner = null then (None :> obj) else x.GetValue owner
+//         let newowner = x.GetValue owner
          loop xs newowner ((owner, x) :: acc)
       | []      -> acc
    loop props owner []
@@ -43,23 +56,15 @@ let private recordReaders = memoize FSharpValue.PreComputeRecordReader
 let private recordFields  = memoize FSharpType.GetRecordFields
 let private tupleReader   = memoize FSharpValue.PreComputeTupleReader
 
-let private (|OptionValue|_|) (owner:obj, prop:PropertyInfo) =
-   let typ = owner.GetType().FullName
-   // Such a hack!
-   if typ.IndexOf("FSharpOption") >= 0 then Some (owner, prop) else None
-
-let private (|Record|_|) (owner:obj, prop:PropertyInfo) = 
-   if FSharpType.IsRecord (owner.GetType()) then Some (owner,prop) else None
-
 let set<'r,'t> (root:'r) (expr:Expr<'r -> 't>) (value:'t) = 
    let rec loop (props: (obj*PropertyInfo) list) (setval: obj) =
       match props with 
       | OptionValue(owner, prop) :: xs -> 
-          let ty = owner.GetType()
+          let ty = prop.DeclaringType
           let v = System.Activator.CreateInstance(ty, setval)
           loop xs v
       | Record(owner,prop) :: xs ->
-         let ownertype = owner.GetType()
+         let ownertype = prop.DeclaringType
          let newval = 
             let vals = recordReaders(ownertype)(owner)
             let fields = recordFields(ownertype)
