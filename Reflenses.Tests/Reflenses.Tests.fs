@@ -21,7 +21,7 @@ let recursivedata = { Name = "Test"; Record = Some { Age = 99; Record = Some { N
 
 let (<=>)  (expected:'t) (actual:'t) = Assert.Equal<'t>(expected, actual) 
 let (<!=>) (expected:'t) (actual:'t) = Assert.NotEqual<'t>(expected, actual) 
-   
+
 [<Fact>]
 let ``Lambda properties 1`` () = 
    let expr = <@ (fun (p:Person) -> p.Car.Make.Make) @>
