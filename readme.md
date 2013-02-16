@@ -50,11 +50,12 @@ This is also fully type checked.
 ## Performance
 
 This is way slower than the built-in way of creating new records. 
-Before optmizing, a test run of 10.000 records would take ~12 seconds
-on my 4 years old laptop. After optmizing the most obvious bits, 
+Before optimizing, a test run of 10.000 records would take ~12 seconds
+on my 4 year old laptop. After optmizing the most obvious bits, 
 it's down to ~4 seconds, where the native F# version is ~2 ms.
-If you hoist the expression out of the loop, you get a massive speedup. This literal doesn't seem to 
-get cached by F#. 
+If you hoist the expression out of the loop, you get a massive speedup. 
+This quotation literal doesn't seem to get cached by F#, even
+when it does not capture any locals. 
 
      let expr = <@ (fun f -> f.Car.Make.Make) @>
      
