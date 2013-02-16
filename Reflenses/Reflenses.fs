@@ -7,26 +7,6 @@ open Microsoft.FSharp.Quotations.ExprShape
 open Microsoft.FSharp.Quotations.DerivedPatterns
 open Microsoft.FSharp.Reflection
 open System.Reflection
-// Old, broken syntax
-//let rec getProps (expr: Expr) acc =
-//   match expr with
-//   | PropertyGet(expr, propOrValInfo, exli) ->
-//      let acc = propOrValInfo :: acc
-//      exli |> List.iter (fun l -> printfn "%A" l)
-//      match expr with | Some x -> getProps x acc | None -> acc
-//   | x -> acc
-
-// Before tuple support
-//let getLambdaProps (expr: Expr) =
-//   let rec loop expr acc =
-//      match expr with
-//      | ShapeLambda (v,expr) -> loop expr []
-//      | PropertyGet(expr, propOrValInfo, exli) ->
-//         let acc = propOrValInfo :: acc
-//         match expr with | Some x -> loop x acc | None -> acc
-//      | x -> acc
-//   loop expr []
-
 
 let rec getLambdaProps (expr: Expr) =
    let rec loop expr acc =
@@ -63,19 +43,30 @@ let private recordReaders = memoize FSharpValue.PreComputeRecordReader
 let private recordFields  = memoize FSharpType.GetRecordFields
 let private tupleReader   = memoize FSharpValue.PreComputeTupleReader
 
+let private (|OptionValue|_|) (owner:obj, prop:PropertyInfo) =
+   let typ = owner.GetType().FullName
+   // Such a hack!
+   if typ.IndexOf("FSharpOption") >= 0 then Some (owner, prop) else None
+
+let private (|Record|_|) (owner:obj, prop:PropertyInfo) = 
+   if FSharpType.IsRecord (owner.GetType()) then Some (owner,prop) else None
+
 let set<'r,'t> (root:'r) (expr:Expr<'r -> 't>) (value:'t) = 
-   let rec loop (props: (obj*PropertyInfo) list) setval =
+   let rec loop (props: (obj*PropertyInfo) list) (setval: obj) =
       match props with 
-      //| (owner,prop) :: [] -> setval
-      | (owner,prop) :: xs ->
+      | OptionValue(owner, prop) :: xs -> 
+          let ty = owner.GetType()
+          let v = System.Activator.CreateInstance(ty, setval)
+          loop xs v
+      | Record(owner,prop) :: xs ->
          let ownertype = owner.GetType()
          let newval = 
-               let vals = recordReaders(ownertype)(owner)
-               let fields = recordFields(ownertype)
-               let idx = fields |> Array.findIndex (fun f -> f.Name = prop.Name)
-               vals.[idx] <- setval
-               let r = recordMakers(ownertype)(vals)
-               r
+            let vals = recordReaders(ownertype)(owner)
+            let fields = recordFields(ownertype)
+            let idx = fields |> Array.findIndex (fun f -> f.Name = prop.Name)
+            vals.[idx] <- setval
+            let r = recordMakers(ownertype)(vals)
+            r
          loop xs newval
       | _ -> setval
 

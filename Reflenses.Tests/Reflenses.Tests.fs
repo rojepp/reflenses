@@ -81,7 +81,7 @@ let ``Set single record value`` () =
 
 [<Fact>] // Doesn't work at the moment, trouble with option types (Record.Value)
 let ``Set single record value recursive`` () = 
-   let result = set recursivedata <@ (fun r -> r.Record.Value.Record.Value.Name ) @> "Changed"
+   let result = set recursivedata <@ (fun (r:RecRecordA) -> r.Record.Value.Record.Value.Name ) @> "Changed"
    let expected = { Name = "Test"; Record = Some { Age = 99; Record = Some { Name = "Changed"; Record = None } } }
    expected <=> result
 
@@ -100,5 +100,22 @@ let ``Set 3-tuple values`` () =
                                                                 Year = 2012 } }
    expected <=> result
 
+[<Fact>]
+let ``Set option type value on None`` () = 
+   let result = set testperson <@ (fun p -> p.BirthDate.Value) @> (DateTime(2001,1,1))
+   let expected = { testperson with BirthDate = Some (DateTime(2001,1,1)) }
+   expected <=> result
 
+[<Fact>]
+let ``Set option type on None`` () = 
+   let result = set testperson <@ (fun p -> p.BirthDate) @> (Some (DateTime(2001,1,1)))
+   let expected = { testperson with BirthDate = Some (DateTime(2001,1,1)) }
+   expected <=> result
+
+[<Fact>]
+let ``Set option type value on Some`` () = 
+   let a = set testperson <@ (fun p -> p.BirthDate) @> (Some (DateTime(2001,1,1)))
+   let a = set a <@ (fun p -> p.BirthDate.Value) @> (DateTime(2111,1,1))
+   let expected = { testperson with BirthDate = Some (DateTime(2111,1,1)) }
+   expected <=> a
 
