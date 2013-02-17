@@ -8,12 +8,12 @@ open Microsoft.FSharp.Quotations.DerivedPatterns
 open Microsoft.FSharp.Reflection
 open System.Reflection
 
-let private (|OptionValue|_|) (owner:obj, prop:PropertyInfo) =
+let inline private (|OptionValue|_|) (owner:obj, prop:PropertyInfo) =
    let typ = prop.DeclaringType.FullName
    // Such a hack!
    if typ.IndexOf("FSharpOption") >= 0 then Some (owner, prop) else None
 
-let private (|Record|_|) (owner:obj, prop:PropertyInfo) = 
+let inline private (|Record|_|) (owner:obj, prop:PropertyInfo) = 
    if FSharpType.IsRecord (prop.DeclaringType) then Some (owner,prop) else None
 
 let rec getLambdaProps (expr: Expr) =
@@ -30,13 +30,8 @@ let rec getLambdaProps (expr: Expr) =
 let getValues (props: PropertyInfo list) (owner:obj) = 
    let rec loop (props: PropertyInfo list) owner acc= 
       match props with 
-//      | OptionValue(owner, prop) :: xs -> 
-//          let newowner = if owner = null then x.GetValue () else x.GetValue owner
-//          let v = System.Activator.CreateInstance(ty, setval)
-//          loop xs newowner acc
       | x :: xs -> 
          let newowner = if owner = null then (None :> obj) else x.GetValue owner
-//         let newowner = x.GetValue owner
          loop xs newowner ((owner, x) :: acc)
       | []      -> acc
    loop props owner []
@@ -79,6 +74,7 @@ let set<'r,'t> (root:'r) (expr:Expr<'r -> 't>) (value:'t) =
                      | true -> tupleReader(typeof<'t>)(value) |> List.ofArray
                      | _    -> [value]
    let props = getLambdaProps expr |> List.zip tuplevalues
+   
    // Tupled stuff: Kind of a brute force approach. Per tuple, create a new record, use that as seed for next tuple until done. 
    
    let mutable v = root

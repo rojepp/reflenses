@@ -65,16 +65,16 @@ when it does not capture any locals.
         for i in 1 .. iterations do
            f () |> ignore
         sw.Stop()
-        sw.ElapsedMilliseconds
+        printfn "%A" sw.ElapsedMilliseconds
      
      time (fun () -> set robert expr "Volvo")  10000 // Expression out of loop, fast
      time (fun () -> set robert <@ (fun f -> f.Car.Make.Make) @> "Volvo" ) 10000// Slow
      time (fun () -> { robert with Car = { robert.Car with Make = { robert.Car.Make with Make = "Volvo" } } } ) 10000 // Fastest
+          
+     444L
+     2514L
+     19L
      
-     Real: 00:00:00.519, CPU: 00:00:00.530, GC gen0: 9, gen1: 0, gen2: 0
-     Real: 00:00:04.367, CPU: 00:00:04.336, GC gen0: 85, gen1: 0, gen2: 0
-     Real: 00:00:00.002, CPU: 00:00:00.000, GC gen0: 0, gen1: 0, gen2: 0
-
 Code is in F# with no other dependencies for runtime. Tested by XUnit.
 
 [mausch]: http://bugsquash.blogspot.se/2011/11/lenses-in-f.html
