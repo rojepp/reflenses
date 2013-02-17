@@ -68,7 +68,7 @@ when it does not capture any locals.
         sw.ElapsedMilliseconds
      
      time (fun () -> set robert expr "Volvo")  10000 // Expression out of loop, fast
-     time (fun () -> set robert <@ (fun f -> f.Car.Make.Make) @> "Volvo" ) 10000b// Slow
+     time (fun () -> set robert <@ (fun f -> f.Car.Make.Make) @> "Volvo" ) 10000// Slow
      time (fun () -> { robert with Car = { robert.Car with Make = { robert.Car.Make with Make = "Volvo" } } } ) 10000 // Fastest
      
      Real: 00:00:00.519, CPU: 00:00:00.530, GC gen0: 9, gen1: 0, gen2: 0
