@@ -79,7 +79,7 @@ let ``Set single record value`` () =
    let expected = { testperson with Car = { testperson.Car with Make = { Make = "Volvo" } } }
    expected <=> result
 
-[<Fact>] // Doesn't work at the moment, trouble with option types (Record.Value)
+[<Fact>]
 let ``Set single record value recursive`` () = 
    let result = set recursivedata <@ (fun (r:RecRecordA) -> r.Record.Value.Record.Value.Name ) @> "Changed"
    let expected = { Name = "Test"; Record = Some { Age = 99; Record = Some { Name = "Changed"; Record = None } } }

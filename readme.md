@@ -52,7 +52,7 @@ This is also fully type checked.
 This is way slower than the built-in way of creating new records. 
 Before optimizing, a test run of 10.000 records would take ~12 seconds
 on my 4 year old laptop. After optmizing the most obvious bits, 
-it's down to ~4 seconds, where the native F# version is ~2 ms.
+it's down to ~3 seconds, where the native F# version is ~20 ms.
 If you hoist the expression out of the loop, you get a massive speedup. 
 This quotation literal doesn't seem to get cached by F#, even
 when it does not capture any locals. 
@@ -71,10 +71,10 @@ when it does not capture any locals.
      time (fun () -> set robert <@ (fun f -> f.Car.Make.Make) @> "Volvo" ) 10000// Slow
      time (fun () -> { robert with Car = { robert.Car with Make = { robert.Car.Make with Make = "Volvo" } } } ) 10000 // Fastest
           
-     444L
-     2514L
-     19L
-     
+     152 ms
+     2805 ms
+     32 ms
+
 Code is in F# with no other dependencies for runtime. Tested by XUnit.
 
 [mausch]: http://bugsquash.blogspot.se/2011/11/lenses-in-f.html
