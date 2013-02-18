@@ -71,9 +71,9 @@ when it does not capture any locals.
      time (fun () -> set robert <@ (fun f -> f.Car.Make.Make) @> "Volvo" ) 10000// Slow
      time (fun () -> { robert with Car = { robert.Car with Make = { robert.Car.Make with Make = "Volvo" } } } ) 10000 // Fastest
           
-     152 ms
-     2805 ms
-     32 ms
+     104 ms
+     2314 ms
+     20 ms
 
 Code is in F# with no other dependencies for runtime. Tested by XUnit.
 

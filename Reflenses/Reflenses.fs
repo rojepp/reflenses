@@ -11,11 +11,12 @@ open System.Reflection
 let private memoize f = 
     let cache = System.Collections.Generic.Dictionary<_, _>()
     fun x -> 
-        match cache.TryGetValue x with
-        | true, v  -> v
-        | false, _ -> let res = f x
-                      cache.Add(x, res)
-                      res
+        let mutable res = Unchecked.defaultof<_>
+        match cache.TryGetValue(x, &res) with
+        | true -> res
+        | false -> let res = f x
+                   cache.Add(x, res)
+                   res
 
 // Never flushed from cache. Should not be a problem for most apps.
 let private recordMakers  = memoize FSharpValue.PreComputeRecordConstructor
@@ -23,11 +24,11 @@ let private recordReaders = memoize FSharpValue.PreComputeRecordReader
 let private recordFields  = memoize FSharpType.GetRecordFields
 let private tupleReader   = memoize FSharpValue.PreComputeTupleReader
 let private recordTypes   = memoize FSharpType.IsRecord
+let private optionTypes   = memoize (fun (t: System.Type) -> let n = t.FullName 
+                                                             n.IndexOf("FSharpOption") >= 0) // Such a hack!
 
 let inline private (|OptionValue|_|) (owner:obj, prop:PropertyInfo) =
-   let typ = prop.DeclaringType.FullName
-   // Such a hack!
-   if typ.IndexOf("FSharpOption") >= 0 then Some (owner, prop) else None
+   if optionTypes(prop.DeclaringType) then Some (owner, prop) else None
 
 let inline private (|Record|_|) (owner:obj, prop:PropertyInfo) = 
    if recordTypes prop.DeclaringType then Some (owner,prop) else None
@@ -35,9 +36,9 @@ let inline private (|Record|_|) (owner:obj, prop:PropertyInfo) =
 let getLambdaProps (expr: Expr) =
    let rec loop expr acc =
       match expr with
-      | ShapeLambda (v,expr) -> loop expr []
+      | ShapeLambda (_,expr) -> loop expr []
       | NewTuple exprs -> exprs |> List.map (fun x -> loop x [] |> List.head)
-      | PropertyGet(expr, propOrValInfo, exli) ->
+      | PropertyGet(expr, propOrValInfo, _) ->
          let acc = propOrValInfo :: acc
          match expr with | Some x -> loop x acc | None -> [acc]
       | x -> [acc]
