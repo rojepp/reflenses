@@ -16,7 +16,7 @@ let inline private (|OptionValue|_|) (owner:obj, prop:PropertyInfo) =
 let inline private (|Record|_|) (owner:obj, prop:PropertyInfo) = 
    if FSharpType.IsRecord (prop.DeclaringType) then Some (owner,prop) else None
 
-let rec getLambdaProps (expr: Expr) =
+let getLambdaProps (expr: Expr) =
    let rec loop expr acc =
       match expr with
       | ShapeLambda (v,expr) -> loop expr []
@@ -27,7 +27,7 @@ let rec getLambdaProps (expr: Expr) =
       | x -> [acc]
    loop expr []
 
-let getValues (props: PropertyInfo list) (owner:obj) = 
+let inline getValues (props: PropertyInfo list) (owner:obj) = 
    let rec loop (props: PropertyInfo list) owner acc= 
       match props with 
       | x :: xs -> 
@@ -51,6 +51,13 @@ let private recordReaders = memoize FSharpValue.PreComputeRecordReader
 let private recordFields  = memoize FSharpType.GetRecordFields
 let private tupleReader   = memoize FSharpValue.PreComputeTupleReader
 
+/// <summary>Make a copy of an F# Record type</summary>
+/// <param name="root">The record to make a copy of</param>
+/// <param name="expr">An F# Quotation expression that returns the properties to be changed. Has the signature <c>'r -> 't</c>
+/// where <c>'r</c> is the record type and <c>'t</c> is the property type. <c>'t</c> may also be tupled and
+/// contain several properties</param>
+/// <param name="root">The value(s) to set for this Expr</param>
+/// <returns>A new record with updated values</returns>
 let set<'r,'t> (root:'r) (expr:Expr<'r -> 't>) (value:'t) = 
    let rec loop (props: (obj*PropertyInfo) list) (setval: obj) =
       match props with 
@@ -81,7 +88,4 @@ let set<'r,'t> (root:'r) (expr:Expr<'r -> 't>) (value:'t) =
    for value, proplist in props do
       let withValues = getValues proplist v
       v <- loop withValues value :?> 'r
-         
    v
-
-      

@@ -17,16 +17,9 @@ let inline time f iterations =
    for i in 1 .. iterations do
       f () |> ignore
    sw.Stop()
-   sw.ElapsedMilliseconds
+   printfn "%A" sw.ElapsedMilliseconds
 
 time (fun () -> set robert expr "Volvo")  10000 // Fast
 time (fun () -> set robert <@ (fun f -> f.Car.Make.Make) @> "Volvo" ) 10000// Slow
 time (fun () -> { robert with Car = { robert.Car with Make = { robert.Car.Make with Make = "Volvo" } } } ) 10000// Slow
-
-for i in [1..10000] do
-   //let newrobert = set robert expr "Volvo" // Fast
-   let newrobert = set robert <@ (fun f -> f.Car.Make.Make) @> "Volvo" // Slow
-  // let newrobert = { robert with Car = { robert.Car with Make = { robert.Car.Make with Make = "Volvo" } } }
-
-   ()
 
