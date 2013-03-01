@@ -48,7 +48,7 @@ let inline getValues (props: PropertyInfo list) (owner:obj) =
    let rec loop (props: PropertyInfo list) owner acc= 
       match props with 
       | x :: xs -> 
-         let newowner = if owner = null then (None :> obj) else x.GetValue owner
+         let newowner = if owner = null then (None :> obj) else x.GetValue(owner, null)
          loop xs newowner ((owner, x) :: acc)
       | []      -> acc
    loop props owner []
