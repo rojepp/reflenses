@@ -26,7 +26,7 @@ Inspired by [Mauricio Scheffers post][mausch].
     let newversion2 = { newversion with Pet = Some { newversion.Pet with Name = "ABC" } }
 
 With Reflenses, you can create a new record by doing this: 
-
+```fsharp
     // The simple case is not a win, more complex than 
     // the built-in method. 
     let newversion = set original <@ (fun p -> p.FavoriteColor) @> "Yellow"
@@ -35,6 +35,7 @@ With Reflenses, you can create a new record by doing this:
     let newversion2 = set newversion <@ (fun p -> p.Pet) @> (Some { Animal = "Monkey"; Name = "Spot" })
     // Just replace the pet name
     let renamedpet = set newversion <@ (fun p -> p.Pet.Value.Name) @> "Spot (still a dog)"
+```
 
 All of these are type-checked, thanks to the power of F# quotations. 
 I'm not quite happy with the syntax for setting partial options,
