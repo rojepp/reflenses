@@ -22,8 +22,10 @@ let newversion = { original with FavoriteColor = "Yellow" }
 // You have to replace all of it. 
 // Better pray that newversion.Pet was a 'Some'!
 let newversion2 = { newversion with Pet = Some { newversion.Pet with Name = "ABC" } }
+```
 
 With Reflenses, you can create a new record by doing this: 
+
 ```fsharp
 // The simple case is not a win, more complex than 
 // the built-in method. 
